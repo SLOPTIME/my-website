@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLOPONG - The Official SlopTime Pong Game</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Sans+MS&display=swap');
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #ff00ff;
+            color: #00ffff;
+            text-shadow: 3px 3px 0 #ff00ff;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        canvas {
+            background: url('https://i.imgur.com/j9UIcYS.jpeg');
+            background-size: cover;
+            border: 8px dashed #ffff00;
+            box-shadow: 0 0 20px #ff00ff;
+        }
+h1 {
+            color: #ffff00;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+        .controls {
+            margin-top: 20px;
+            color: white;
+            text-align: center;
+        }
+        a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>✧ SLOPONG  ✧</h1>
+    <canvas id="gameCanvas"></canvas>
+        <div class="controls">
+            <p>Use MOUSE to move your paddle (left side) | <a href="index.html">Back to SlopQuiz</a></p>
+        <p>First to 5 points wins! Battle against the Veggie Freaks!</p>
+</div>
+<script>
+        // Set canvas size based on window
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = Math.min(window.innerWidth * 0.9, 800);
+            canvas.height = Math.min(window.innerHeight * 0.7, 500);
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Game elements (scaled based on canvas size)
+        const paddleHeight = canvas.height * 0.2;
+        const paddleWidth = canvas.width * 0.02;
+        let paddleY = (canvas.height - paddleHeight) / 2;
+        let aiPaddleY = (canvas.height - paddleHeight) / 2;
+const ballRadius = canvas.width * 0.015;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let ballSpeedX = canvas.width * 0.006;
+        let ballSpeedY = canvas.width * 0.006;
+        
+        let playerScore = 0;
+        let computerScore = 0;
+        const winningScore = 5;
+        let gameOver = false;
+        
+        // Mouse movement handler
+        canvas.addEventListener('mousemove', function(evt) {
+            const mousePos = calculateMousePos(evt);
+            paddleY = mousePos.y - (paddleHeight / 2);
+        });
+        
+        function calculateMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            const root = document.documentElement;
+            return {
+                x: evt.clientX - rect.left - root.scrollLeft,
+                y: evt.clientY - rect.top - root.scrollTop
+            };
+        }
+        
+        // Reset ball to center
+        function resetBall() {
+            if (gameOver) {
+                return;
+            }
+            
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            ballSpeedX = -ballSpeedX;
+            ballSpeedY = 5;
+        }
+            // Veggie Freaks AI
+            function computerMovement() {
+                const paddleCenter = aiPaddleY + (paddleHeight / 2);
+                const reactionSpeed = canvas.height * 0.02; // Faster reaction
+                
+                // Track ball movement more aggressively
+                const ballFutureY = ballY + (ballSpeedY * 5); // Predict ball position
+                
+                if (paddleCenter < ballFutureY - 10) {
+                    aiPaddleY += reactionSpeed;
+                } else if (paddleCenter > ballFutureY + 10) {
+                    aiPaddleY -= reactionSpeed;
+                }
+                
+                // Keep paddle on screen
+                aiPaddleY = Math.max(0, Math.min(canvas.height - paddleHeight, aiPaddleY));
+            }
+// Collision detection
+        function isBallCollidingWithPaddle() {
+            const paddleTop = paddleY;
+            const paddleBottom = paddleY + paddleHeight;
+            const paddleLeft = 0;
+            const paddleRight = paddleWidth;
+            
+            const aiPaddleLeft = canvas.width - paddleWidth;
+            const aiPaddleRight = canvas.width;
+            const aiPaddleTop = aiPaddleY;
+            const aiPaddleBottom = aiPaddleY + paddleHeight;
+            
+            // Check player paddle collision
+            if (ballX - ballRadius < paddleRight &&
+                ballY > paddleTop &&
+                ballY < paddleBottom) {
+                return 1; // Player paddle
+            }
+            
+            // Check AI paddle collision
+            if (ballX + ballRadius > aiPaddleLeft &&
+                ballY > aiPaddleTop &&
+                ballY < aiPaddleBottom) {
+                return 2; // AI paddle
+            }
+            
+            return 0; // No collision
+}
+        
+        // Main game loop
+        function gameLoop() {
+            if (gameOver) {
+                return;
+            }
+            // Move ball and update AI
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+            computerMovement();
+// Ball collision with top and bottom
+            if (ballY - ballRadius < 0 || ballY + ballRadius > canvas.height) {
+                ballSpeedY = -ballSpeedY;
+            }
+            // Ball collision with paddles
+            const collision = isBallCollidingWithPaddle();
+if (collision === 1 || collision === 2) {
+                ballSpeedX = -ballSpeedX;
+                
+                // Add some randomness to the bounce
+                const paddleCenter = collision === 1 ? 
+                    paddleY + paddleHeight / 2 : 
+                    aiPaddleY + paddleHeight / 2;
+                const deltaY = ballY - paddleCenter;
+                ballSpeedY = deltaY * 0.35;
+                
+                // Increase speed slightly
+                ballSpeedX *= 1.05;
+                ballSpeedY *= 1.05;
+            }
+            // Ball out of bounds (right side - player scores)
+            if (ballX + ballRadius > canvas.width) {
+                playerScore++;
+                if (playerScore >= winningScore) {
+                    gameOver = true;
+                } else {
+                    resetBall();
+                }
+            }
+            
+            // Ball out of bounds (left side - AI scores)
+            if (ballX - ballRadius < 0) {
+                computerScore++;
+                if (computerScore >= winningScore) {
+                    gameOver = true;
+                } else {
+                    resetBall();
+                }
+            }
+// Draw everything
+            drawEverything();
+            
+            // Continue the game loop
+            requestAnimationFrame(gameLoop);
+        }
+        // ASCII animals/characters
+        const asciiCritters = [
+            "≽(◕ ᴗ ◕)≼",
+            "ᘳ◕ᴥ◕ᘰ",
+            "ᘳ✧ᴥ✧ᘰ",
+            "ᘳᐢ. .ᐢᘰ",
+            "ᘳꔸ ﹏ ꔸᘰ",
+            "ᘳ⩌ᴥ⩍ᘰ",
+            "ᘳ⩊ꔢ⩊ᘰ"
+        ];
+        const critters = [];
+        
+        // Initialize critters
+        function initCritters() {
+            for (let i = 0; i < 8; i++) {
+                critters.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    speedX: (Math.random() - 0.5) * 2,
+                    speedY: (Math.random() - 0.5) * 2,
+                    text: asciiCritters[Math.floor(Math.random() * asciiCritters.length)],
+                    color: `hsl(${Math.random() * 360}, 100%, 70%)`
+                });
+            }
+        }
+        
+        // Update critters
+        function updateCritters() {
+            critters.forEach(critter => {
+                critter.x += critter.speedX;
+                critter.y += critter.speedY;
+                
+                // Bounce off edges
+                if (critter.x < 0 || critter.x > canvas.width) critter.speedX *= -1;
+                if (critter.y < 0 || critter.y > canvas.height) critter.speedY *= -1;
+            });
+        }
+        
+        // Draw critters
+        function drawCritters() {
+            critters.forEach(critter => {
+                ctx.fillStyle = critter.color;
+                ctx.font = '20px Comic Sans MS';
+                ctx.fillText(critter.text, critter.x, critter.y);
+            });
+        }
+        
+        // Draw game elements
+        function drawEverything() {
+            // Background image
+            const bgImage = new Image();
+            bgImage.src = 'https://i.imgur.com/T6aekqY.jpeg';
+            ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+// Draw critters
+            updateCritters();
+            drawCritters();
+// Draw paddles
+            ctx.fillStyle = '#00ffff';
+            ctx.fillRect(0, paddleY, paddleWidth, paddleHeight); // Player paddle
+            ctx.fillRect(canvas.width - paddleWidth, aiPaddleY, paddleWidth, paddleHeight); // AI paddle
+// Draw ball
+            ctx.fillStyle = '#ffff00';
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2, true);
+            ctx.fill();
+            // Draw center line (dashed)
+            ctx.strokeStyle = '#ff00ff';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([10, 5]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            // Draw scores with labels
+            ctx.fillStyle = 'white';
+            ctx.font = '20px Comic Sans MS';
+            ctx.fillText('YOU', 50, 30);
+            ctx.fillText('VEGGIE FREAKS', canvas.width - 170, 30);
+ctx.font = '30px Comic Sans MS';
+            ctx.fillText(playerScore, 100, 60);
+            ctx.fillText(computerScore, canvas.width - 100, 60);
+// Draw game over message
+            if (gameOver) {
+                ctx.fillStyle = '#ffff00';
+                ctx.font = '30px Comic Sans MS';
+            const message = playerScore >= winningScore ? 
+                    'YOU WIN! VEGGIE FREAKS DEFEATED!' : 
+                    'VEGGIE FREAKS WIN! EAT YOUR SLOP!';
+ctx.fillText(message, canvas.width / 2 - ctx.measureText(message).width/2, canvas.height / 2);
+                
+                ctx.font = `${canvas.width * 0.075}px Comic Sans MS`;
+                const restartText = 'Click to play again';
+                ctx.fillText(restartText, canvas.width / 2 - ctx.measureText(restartText).width/2, canvas.height / 2 + 50);
+            }
+        }
+        
+        // Handle click to restart
+        canvas.addEventListener('click', function() {
+            if (gameOver) {
+                playerScore = 0;
+                computerScore = 0;
+                gameOver = false;
+                resetBall();
+                gameLoop();
+            }
+        });
+        // Start the game with random initial direction
+        ballSpeedX = (Math.random() > 0.5 ? 1 : -1) * canvas.width * 0.006;
+        ballSpeedY = (Math.random() * 2 - 1) * canvas.width * 0.006;
+        initCritters();
+        gameLoop();
+</script>
+</body>
+</html>
