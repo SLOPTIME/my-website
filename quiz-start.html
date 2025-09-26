@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlopQuiz - The Quiz!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Sans+MS&display=swap');
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #ff00ff;
+            background-image: url('https://i.imgur.com/pDvQHyf.jpeg');
+            color: #00ffff;
+            text-shadow: 3px 3px 0 #ff00ff;
+        }
+        .blink {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .pixel-border {
+            border: 4px solid;
+            border-image: repeating-linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff00ff) 10;
+        }
+        .question-box {
+            background: rgba(0, 0, 0, 0.7);
+            border: 3px dashed #ffff00;
+        }
+        .option:hover {
+            background: rgba(255, 255, 0, 0.3);
+            transform: scale(1.02);
+        }
+        .progress-bar {
+            height: 20px;
+            background: linear-gradient(to right, #ff00ff, #00ffff);
+        }
+        .cursor-trail {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: url('http://www.animatedgif.net/underconstruction/construction2_e0.gif');
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Cursor trail -->
+    <div id="cursor-trail" class="cursor-trail"></div>
+
+    <!-- Animated Background -->
+    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; background: repeating-linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff00ff); background-size: 400% 400%; animation: gradient 15s ease infinite;"></div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="text-center mb-6">
+            <h1 class="text-4xl font-bold mb-2 text-yellow-300">
+                <span class="blink">✧</span> SLOPQUIZ! <span class="blink">✧</span>
+            </h1>
+            <p class="text-lg bg-black p-2 inline-block text-white">
+                Test your slop knowledge!
+            </p>
+        </header>
+
+        <!-- Quiz Container -->
+        <div class="max-w-3xl mx-auto">
+            <!-- Progress Bar -->
+            <div class="mb-6">
+                <div class="flex justify-between text-white mb-1">
+                    <span>Question <span id="current-question">1</span> of 10</span>
+                    <span id="score">Score: 0</span>
+                </div>
+                <div class="progress-bar rounded-full" id="progress" style="width: 10%"></div>
+            </div>
+
+            <!-- Question Box -->
+            <div class="question-box p-6 rounded-lg mb-6 text-white" id="question-container">
+                <h2 class="text-2xl font-bold mb-4 text-yellow-300" id="question-text">Loading question...</h2>
+                
+                <!-- Image for question -->
+                <div class="flex justify-center mb-6">
+                    <img src="http://static.photos/food/640x360/6" id="question-image" class="w-full max-w-md border-4 border-yellow-400">
+                </div>
+                
+                <!-- Options -->
+                <div class="grid grid-cols-1 gap-3" id="options-container">
+                    <div class="option bg-black bg-opacity-50 p-3 rounded cursor-pointer border border-yellow-400 transition-all">
+                        <input type="radio" name="option" id="option1" class="hidden">
+                        <label for="option1" class="cursor-pointer block" id="option1-text">Option 1</label>
+                    </div>
+                    <div class="option bg-black bg-opacity-50 p-3 rounded cursor-pointer border border-yellow-400 transition-all">
+                        <input type="radio" name="option" id="option2" class="hidden">
+                        <label for="option2" class="cursor-pointer block" id="option2-text">Option 2</label>
+                    </div>
+                    <div class="option bg-black bg-opacity-50 p-3 rounded cursor-pointer border border-yellow-400 transition-all">
+                        <input type="radio" name="option" id="option3" class="hidden">
+                        <label for="option3" class="cursor-pointer block" id="option3-text">Option 3</label>
+                    </div>
+                    <div class="option bg-black bg-opacity-50 p-3 rounded cursor-pointer border border-yellow-400 transition-all">
+                        <input type="radio" name="option" id="option4" class="hidden">
+                        <label for="option4" class="cursor-pointer block" id="option4-text">Option 4</label>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <button id="submit-btn" class="mt-6 bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-2 px-6 rounded-full inline-block transform hover:scale-105 transition-transform">
+                    <i data-feather="arrow-right" class="inline mr-2"></i> SUBMIT ANSWER
+                </button>
+            </div>
+            
+            <!-- Next Button (hidden initially) -->
+            <button id="next-btn" class="hidden mx-auto bg-green-400 hover:bg-green-300 text-black font-bold py-2 px-6 rounded-full inline-block transform hover:scale-105 transition-transform">
+                <i data-feather="chevron-right" class="inline mr-2"></i> NEXT QUESTION
+            </button>
+            
+            <!-- Results Container (hidden initially) -->
+            <div id="results-container" class="hidden text-center bg-black bg-opacity-70 p-6 rounded-lg pixel-border mt-6">
+                <h2 class="text-3xl font-bold text-yellow-300 mb-4">QUIZ COMPLETE!</h2>
+                <p class="text-xl text-white mb-6">Your final score: <span id="final-score" class="text-2xl font-bold text-yellow-300">0</span>/10</p>
+                
+                <div class="mb-6">
+                    <img src="https://i.imgur.com/YT8TqWp.jpeg" class="w-full max-w-md border-4 border-yellow-400 mx-auto">
+                </div>
+                
+                <div class="mb-6">
+                    <p class="text-white text-lg" id="result-message">You're a microwave meal novice!</p>
+                </div>
+                
+                <div class="flex justify-center space-x-4">
+                    <a href="index.html" class="bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-2 px-4 rounded-full inline-block">
+                        <i data-feather="home" class="inline mr-2"></i> HOME
+                    </a>
+                    <button onclick="resetQuiz()" class="bg-blue-400 hover:bg-blue-300 text-black font-bold py-2 px-4 rounded-full inline-block">
+                        <i data-feather="refresh-cw" class="inline mr-2"></i> TRY AGAIN
+                    </button>
+                    <a href="#" class="bg-green-400 hover:bg-green-300 text-black font-bold py-2 px-4 rounded-full inline-block">
+                        <i data-feather="share-2" class="inline mr-2"></i> SHARE
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-white text-sm">
+            <p style="font-size:0.9rem;">© 1998-2023 SlopQuiz • Part of SlopTime Network</p>
+            <p class="mt-2">
+                <a href="https://instagram.com/slop.time" target="_blank" class="hover:text-yellow-300"><i data-feather="instagram" class="inline mr-1"></i> Instagram</a> • 
+                <a href="https://tiktok.com/@sloptime" target="_blank" class="hover:text-yellow-300"><i data-feather="tiktok" class="inline mr-1"></i> TikTok</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Quiz questions
+        const questions = [
+            {
+                question: "What's SRI's(Sloptime Research Industries) official reccomended minimum microwave time for TV Slop dinners?",
+                image: "https://i.imgur.com/3vzohAa.jpeg",
+                options: [
+                    "1 minute",
+                    "5 minutes",
+                    "8 minutes",
+                    "Until plastic melts"
+                ],
+                correct: 1
+            },
+            {
+                question: "Which of these national holidays is the most Slop consumed? (in pounds)",
+                image: "https://i.imgur.com/jYMDm9x.gif",
+                options: [
+                    "Christmas",
+                    "Thanksgiving",
+                    "Nestle® Manditory Day of Jubilee Feast",
+                    "4rd of July"
+                ],
+                correct: 2
+            },
+            {
+                question: "Who was the founding father that first discovered slop for people?",
+                image: "https://i.imgur.com/T6aekqY.jpeg",
+                options: [
+                    "Benny Frank",
+                    "George Washington",
+                    "Sam Adams",
+                    "Seedoyles McGee"
+                ],
+                correct: 3
+            },
+            {
+                question: "Which accredited school did the Slopman attend?",
+                image: "https://i.imgur.com/DBslcvN.jpeg",
+                options: [
+                    "MIT",
+                    "Johm Hompkins",
+                    "UC School of Medicine",
+                    "Harrrvard"
+                ],
+                correct: 1
+            },
+            {
+                question: "سگ خوک آمریکایی نمی‌تواند راه برود زیرا شکمش روی زمین کشیده می‌شود",
+                image: "https://i.imgur.com/jEjwyKT.jpeg",
+                options: [
+                    "آنها خواهند دانست",
+                    "آنها خواهند دانست",
+                    "آنها خواهند دانست",
+                    "آنها یاد خواهند گرفت"
+                ],
+                correct: 3
+            },
+            {
+                question: "",
+                image: "https://i.imgur.com/TIoDe5x.gif",
+                secondaryImage: "https://i.imgur.com/a2kD3Ll.jpeg",
+                options: [
+                    "12:24",
+                    "HR001125C0026 COmpact Front-end Filters at the ElEment-level (COFFEE) Program, Technical Area 2 (TA2)",
+                    "HolyC direct assembly integration",
+                    "∞"
+                ],
+                correct: 2
+            },
+            {
+                question: "Which is the Slopman's favorite artificial food color?",
+                image: "https://i.imgur.com/m512E6y.jpeg",
+                options: [
+                    "FD&C Blue No. 2",
+                    "FD&C Red No. 3",
+                    "FD&C Red No. 40",
+                    "FD&C Yellow No. 6"
+                ],
+                correct: 0
+            },
+            {
+                question: "FDA's Daily Reccomended Slop intake(in Pounds) for a family of 4?",
+                image: "https://i.imgur.com/I6kqJcN.jpeg",
+                options: [
+                    "20",
+                    "50",
+                    "500",
+                    "1250"
+                ],
+                correct: 2
+            },
+            {
+                question: "Who should you listen to when it comes to your eating habits and gut health?",
+                image: "https://i.imgur.com/KTYOZpy.jpeg",
+                options: [
+                    "A Doctor",
+                    "Relative",
+                    "The Supervisor",
+                    "Dietician"
+                ],
+                correct: 2
+            },
+            {
+                question: "Which parts of the body can unhealthy slop damage?",
+                image: "https://i.imgur.com/aqzbCWZ.jpeg",
+                options: [
+                    "None (PERFECTLY SAFE)",
+                    "Liver",
+                    "Kidneys",
+                    "Heart"
+                ],
+                correct: 0
+            }
+        ];
+
+        // Quiz state
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedOption = null;
+
+        // DOM elements
+        const questionText = document.getElementById('question-text');
+        const questionImage = document.getElementById('question-image');
+        const optionsContainer = document.getElementById('options-container');
+        const optionTexts = [
+            document.getElementById('option1-text'),
+            document.getElementById('option2-text'),
+            document.getElementById('option3-text'),
+            document.getElementById('option4-text')
+        ];
+        const submitBtn = document.getElementById('submit-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const resultsContainer = document.getElementById('results-container');
+        const finalScore = document.getElementById('final-score');
+        const resultMessage = document.getElementById('result-message');
+        const currentQuestionSpan = document.getElementById('current-question');
+        const scoreSpan = document.getElementById('score');
+        const progressBar = document.getElementById('progress');
+
+        // Initialize quiz
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            questionText.textContent = question.question;
+            questionImage.src = question.image;
+            
+            // For question 6, show the secondary image as the main image
+            if (currentQuestion === 5 && question.secondaryImage) {
+                questionImage.src = question.secondaryImage;
+            }
+            
+            for (let i = 0; i < 4; i++) {
+                optionTexts[i].textContent = question.options[i];
+            }
+            
+            // Reset selection and styling
+            document.querySelectorAll('input[name="option"]').forEach(radio => {
+                radio.checked = false;
+                radio.disabled = false;
+            });
+            
+            // Reset option styling
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('bg-green-400', 'bg-red-400', 'text-black');
+            });
+            
+            // Update progress
+            currentQuestionSpan.textContent = currentQuestion + 1;
+            progressBar.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            // Hide next button
+            nextBtn.classList.add('hidden');
+            submitBtn.classList.remove('hidden');
+        }
+
+        // Check answer
+        function checkAnswer() {
+            const selected = document.querySelector('input[name="option"]:checked');
+            if (!selected) {
+                alert('Please select an answer!');
+                return;
+            }
+            
+            selectedOption = parseInt(selected.id.replace('option', '')) - 1;
+            const correct = questions[currentQuestion].correct;
+            
+            // Disable all options
+            document.querySelectorAll('input[name="option"]').forEach(radio => {
+                radio.disabled = true;
+            });
+            
+            // Highlight correct and selected
+            const optionDivs = document.querySelectorAll('.option');
+            optionDivs[correct].classList.add('bg-green-400', 'text-black');
+            if (selectedOption !== correct) {
+                optionDivs[selectedOption].classList.add('bg-red-400', 'text-black');
+            }
+            
+            // Update score if correct
+            if (selectedOption === correct) {
+                score++;
+                scoreSpan.textContent = `Score: ${score}`;
+            }
+            
+            // Show next button
+            submitBtn.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+        }
+
+        // Next question
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        // Show results
+        function showResults() {
+            document.getElementById('question-container').classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+            finalScore.textContent = score;
+            
+            // Custom message based on score
+            if (score === 10) {
+                resultMessage.textContent = "Perfect score! You're a SLOPMASTER! Please sit tight, you will soon be picked up and conscripted into active service.";
+            } else if (score >= 7) {
+                resultMessage.textContent = "Great job! Your government is proud of you! An extra .250kg of solidus slop has been credited to your account!";
+            } else if (score >= 4) {
+                resultMessage.textContent = "Not bad! When people ask you if you 'slop here often?' you say 'yeah'";
+            } else {
+                resultMessage.textContent = "UNBELIEVER! DO NOT MOVE!";
+            }
+        }
+
+        // Event listeners
+        submitBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', nextQuestion);
+
+        // Option selection
+        document.querySelectorAll('.option').forEach((option, index) => {
+            option.addEventListener('click', () => {
+                document.getElementById(`option${index + 1}`).checked = true;
+            });
+        });
+
+        // Cursor trail effect
+        document.addEventListener('mousemove', (e) => {
+            const trail = document.getElementById('cursor-trail');
+            trail.style.left = `${e.pageX - 10}px`;
+            trail.style.top = `${e.pageY - 10}px`;
+        });
+
+        // Reset quiz
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            scoreSpan.textContent = `Score: 0`;
+            resultsContainer.classList.add('hidden');
+            document.getElementById('question-container').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        // Start quiz
+        feather.replace();
+        loadQuestion();
+    </script>
+</body>
+</html>
