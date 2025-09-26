@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlopQuiz - Test Your Slop Score!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Sans+MS&display=swap');
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #ff00ff;
+            background-image: url('https://i.imgur.com/j9UIcYS.jpeg');
+            color: #00ffff;
+            text-shadow: 3px 3px 0 #ff00ff;
+        }
+        .blink {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .marquee {
+            white-space: nowrap;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        .marquee span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 15s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+        .pixel-border {
+            border: 4px solid;
+            border-image: repeating-linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff00ff) 10;
+        }
+        .hit-counter {
+            font-family: monospace;
+            background: black;
+            color: lime;
+            padding: 5px;
+            border: 3px double white;
+        }
+        .under-construction {
+            background: yellow;
+            color: red;
+            padding: 5px;
+            transform: rotate(-5deg);
+            display: inline-block;
+            border: 2px dashed red;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Animated Background with ASCII Pigs -->
+    <div id="ascii-pigs" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.5; pointer-events: none; font-family: monospace; white-space: pre;"></div>
+    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; opacity: 0.3; background: repeating-linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff00ff); background-size: 400% 400%; animation: gradient 15s ease infinite;"></div>
+
+    <script>
+        // ASCII pigs slopping around
+        const pigs = [
+            " (´(00)ˋ) ",
+            " (´(00)ˋ)~ ",
+            " ~(´(00)ˋ) ",
+            " (´(00)ˋ)~~ ",
+            " ~~(´(00)ˋ) ",
+            " (´(00)ˋ)~~~ ",
+            " ~~~(´(00)ˋ) "
+        ];
+        
+        const pigContainer = document.getElementById('ascii-pigs');
+        const pigElements = [];
+        const colors = ['#ff00ff', '#00ffff', '#ffff00', '#ff9900'];
+        
+        // Create 15 pigs
+        for (let i = 0; i < 15; i++) {
+            const pig = document.createElement('div');
+            pig.textContent = pigs[Math.floor(Math.random() * pigs.length)];
+            pig.style.position = 'absolute';
+            pig.style.color = colors[Math.floor(Math.random() * colors.length)];
+            pig.style.fontSize = Math.random() * 10 + 10 + 'px';
+            pig.style.left = Math.random() * 100 + '%';
+            pig.style.top = Math.random() * 100 + '%';
+            pig.style.transform = `rotate(${Math.random() * 360}deg)`;
+            pig.speedX = (Math.random() - 0.5) * 0.5;
+            pig.speedY = (Math.random() - 0.5) * 0.5;
+            pigContainer.appendChild(pig);
+            pigElements.push(pig);
+        }
+        
+        // Animate pigs
+        function movePigs() {
+            pigElements.forEach(pig => {
+                let x = parseFloat(pig.style.left);
+                let y = parseFloat(pig.style.top);
+                
+                x += pig.speedX;
+                y += pig.speedY;
+                
+                // Bounce off edges
+                if (x < 0 || x > 100) pig.speedX *= -1;
+                if (y < 0 || y > 100) pig.speedY *= -1;
+                
+                pig.style.left = x + '%';
+                pig.style.top = y + '%';
+                
+                // Occasionally change direction
+                if (Math.random() < 0.01) {
+                    pig.speedX = (Math.random() - 0.5) * 0.5;
+                    pig.speedY = (Math.random() - 0.5) * 0.5;
+                }
+            });
+            
+            requestAnimationFrame(movePigs);
+        }
+        
+        movePigs();
+    </script>
+<div class="container mx-auto px-4 py-8">
+        <!-- Header with animated gif style -->
+        <header class="text-center mb-8">
+            <div class="marquee bg-black p-2 mb-4">
+                <span class="text-xl font-bold text-yellow-300">WELCOME TO SLOPQUIZ! • TEST YOUR SLOP KNOWLEDGE! • MANDATORY FEMA SLOPPINGS WILL BE ADMINISTERED AT 0900! • WELCOME TO SLOPQUIZ!</span>
+            </div>
+            
+            <h1 class="text-4xl font-bold mb-4 text-yellow-300 pixel-border p-4 inline-block">
+                <span class="blink">★</span> SLOPQUIZ <span class="blink">★</span>
+            </h1>
+
+            <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Center GIF Example</title>
+  <style>
+    .centered {
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <img class="centered" src="https://i.imgur.com/2H65QW7.gif" alt="Centered GIF">
+</body>
+</html>  
+            <div class="flex justify-center space-x-4 my-4">
+                <img src="https://i.imgur.com/ZYxbCT6.png" class="w-13 h-16 rounded-full border-4 border-yellow-400">
+                <img src="https://i.imgur.com/mS7JY5r.jpeg" class="w-13 h-16 rounded-full border-4 border-yellow-400">
+                <img src="https://i.imgur.com/R2ShPEB.jpeg" class="w-13 h-16 rounded-full border-4 border-yellow-400">
+            </div>
+            
+           
+           
+        </header>
+
+        <!-- Main Content -->
+        <main class="bg-black bg-opacity-70 p-6 rounded-lg pixel-border">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-yellow-300 mb-4">Are you a Slop Savant?</h2>
+                <p class="text-lg text-white mb-6">Take our quiz to test your knowledge of slop! And discover how little you truly know!</p>
+                
+                <div class="flex justify-center mb-8">
+                    <a href="quiz-start.html">
+                        <img src="https://i.imgur.com/0AuuyFI.jpeg" class="w-full max-w-md border-4 border-yellow-400 hover:border-yellow-300 transition-colors">
+                    </a>
+                </div>
+                
+                <a href="quiz-start.html" class="bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-3 px-6 rounded-full text-xl inline-block transform hover:scale-110 transition-transform animate-pulse hover:animate-none hover:rotate-2">
+                    <i data-feather="play-circle" class="inline mr-2"></i> PLAY NOW!
+                </a>
+                <style>
+                    @keyframes pulse {
+                        0%, 100% { transform: scale(1); }
+                        50% { transform: scale(1.05); }
+                    }
+                    .animate-pulse {
+                        animation: pulse 2s infinite;
+                    }
+                </style>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <div class="bg-purple-900 p-4 rounded-lg">
+                    <h3 class="text-xl font-bold text-yellow-300 mb-2"><i data-feather="award" class="inline mr-2"></i> PRIZES!</h3>
+                    <a href="quiz-start.html">
+                        <img src="https://i.imgur.com/ZYxbCT6.png" class="w-13 h-16 rounded-full border-4 border-yellow-400 hover:border-yellow-300 transition-colors">
+                    </a>
+                    <p class="text-white">Top scorers get featured on SlopTime's Instagram story!</p>
+                </div>
+                
+                <div class="bg-blue-900 p-4 rounded-lg">
+                    <h3 class="text-xl font-bold text-yellow-300 mb-2"><i data-feather="clock" class="inline mr-2"></i> FAST!</h3>
+                    <a href="quiz-start.html">
+                        <img src="https://i.imgur.com/mS7JY5r.jpeg" class="w-13 h-16 rounded-full border-4 border-yellow-400 hover:border-yellow-300 transition-colors">
+                    </a>
+                    <p class="text-white">Counts towards your mandatory service time!</p>
+                </div>
+                
+                <div class="bg-green-900 p-4 rounded-lg">
+                    <h3 class="text-xl font-bold text-yellow-300 mb-2"><i data-feather="users" class="inline mr-2"></i> SOCIAL!</h3>
+                    <a href="quiz-start.html">
+                        <img src="https://i.imgur.com/R2ShPEB.jpeg" class="w-13 h-16 rounded-full border-4 border-yellow-400 hover:border-yellow-300 transition-colors">
+                    </a>
+                    <p class="text-white">Report your friends & neighbors with poor, dishonorable scores!</p>
+                </div>
+            </div>
+        </main>
+        <div style="overflow: hidden; height: 202px; white-space: nowrap;">
+  <marquee behavior="scroll" direction="left" style="width: 100%; height: 202px;">
+    <div style="display: inline-flex;">
+        <a href="slopong.html" style="margin-right: 20px;">
+            <img src="https://i.imgur.com/g0jGXrt.jpeg" width="245" height="202" alt="SLOPONG Game">
+        </a>
+        <a href="movie1.html">
+            <img src="https://i.imgur.com/DV2t6Lr.jpeg" width="245" height="286" alt="Movie 1">
+        </a>
+    </div>
+</marquee>
+        </div>
+<!-- Footer -->
+        <footer class="mt-8 text-center">
+            <div class="hit-counter inline-block px-4 py-2 mb-4">
+                <i data-feather="eye" class="inline mr-2"></i> VISITOR COUNT: <span id="counter">0000001</span>
+            </div>
+            
+            <div class="text-white text-sm">
+                <p style="font-size:0.9rem;">
+                © 1998-2025 SlopQuiz • Part of SlopTime Network</p>
+                <p class="mt-2">
+                    <a href="https://instagram.com/slop.time" target="_blank" class="hover:text-yellow-300"><i data-feather="instagram" class="inline mr-1"></i> Instagram</a> • 
+                    <a href="https://tiktok.com/@sloptime" target="_blank" class="hover:text-yellow-300"><i data-feather="tiktok" class="inline mr-1"></i> TikTok</a> • 
+                    <a href="https://youtube.com/@itsSloptime"
+                    target="_blank"
+                    class="hover:text-yellow-300"><i data-feather="YouTube" class="inline mr-1"></i> YouTube</a>
+                </p>
+            </div>
+            
+            <div class="mt-4">
+                <img src="https://i.imgur.com/znfHJmx.jpeg" class="inline h-8 mx-2">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/GeoCities_logo.svg/1268px-GeoCities_logo.svg.png" class="inline h-8 mx-2">
+                <img src="https://i.imgur.com/MSBh8TM.jpeg" class="inline h-8 mx-2">
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Simple counter animation
+        let count = 1;
+        setInterval(() => {
+            count++;
+            document.getElementById('counter').textContent = String(count).padStart(7, '0');
+        }, 3000);
+        
+        feather.replace();
+    </script>
+</body>
+</html>
