@@ -233,7 +233,7 @@
 <!-- Footer -->
         <footer class="mt-8 text-center">
             <div class="hit-counter inline-block px-4 py-2 mb-4">
-                <i data-feather="eye" class="inline mr-2"></i> VISITOR COUNT: <span id="counter">0000001</span>
+            <i data-feather="eye" class="inline mr-2"></i> VISITOR COUNT: <span id="counter">0000001</span>
             </div>
             
             <div class="text-white text-sm">
@@ -257,14 +257,28 @@
     </div>
 
     <script>
-        // Simple counter animation
-        let count = 1;
-        setInterval(() => {
-            count++;
-            document.getElementById('counter').textContent = String(count).padStart(7, '0');
-        }, 3000);
-        
-        feather.replace();
+    // Get the counter element by its ID
+    const counterElement = document.getElementById('counter');
+
+    // Function to generate a random number and update the counter
+    function updateCounter() {
+        // Generate a random integer between a desired range (e.g., 1000000 and 9999999)
+        const min = 1000000;
+        const max = 9999999;
+        const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+
+        // Convert the number to a string and pad it with leading zeros if necessary
+        const paddedNumber = String(randomNumber).padStart(7, '0');
+
+        // Update the content of the span
+        counterElement.textContent = paddedNumber;
+    }
+
+    // Call the function once to set the initial random number
+    updateCounter();
+
+    // Call the function repeatedly every few seconds (e.g., every 3000 milliseconds or 3 seconds)
+    setInterval(updateCounter, 3000); 
     </script>
 </body>
 </html>
