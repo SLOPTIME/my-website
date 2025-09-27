@@ -1,1 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pig Warlock: Slop Quest</title>
+  <style>
+    body {
+      background: black;
+      color: limegreen;
+      font-family: monospace;
+      white-space: pre;
+      font-size: 14px;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+<pre id="game"></pre>
+
+<script>
+const TILE_W = 3;
+const TILE_H = 3;
+const GRID_W = 20;
+const GRID_H = 10;
+
+const EMPTY_TILE = [
+  '   ',
+  '   ',
+  '   '
+];
+
+const WALL_TILE = [
+  '###',
+  '###',
+  '###'
+];
+
+const SLOP_TILE = [
+  '~~ ',
+  '   ',
+  '   '
+];
+
+const pigSprite = [
+  '(°ᴥ°)',
+  '/|@|\\',
+  '/ \\ '
+];
+
+const farmerSprite = [
+  '[¬_¬]',
+  '/|F|\\',
+  '/ \\ '
+];
+
+let map = [];
+let slops = [];
+
+let pig = { x: 1, y: 1 };
+let farmer = { x: GRID_W - 3, y: GRID_H - 3 };
+
+function createEmptyMap() {
+  map = [];
+  slops = [];
+  for (let y = 0; y < GRID_H; y++) {
+    let row = [];
+    for (let x = 0; x < GRID_W; x++) {
+      if (x === 0 || y === 0 || x === GRID_W - 1 || y === GRID_H - 1 || Math.random() < 0.05) {
+        row.push([...WALL_TILE]);
+      } else {
+        row.push([...EMPTY_TILE]);
+      }
+    }
+    map.push(row);
+  }
+
+  // Add slop
+  for (let i = 0; i < 5; i++) {
+    let sx, sy;
+    do {
+      sx = Math.floor(Math.random() * (GRID_W - 2)) + 1;
+      sy = Math.floor(Math.random() * (GRID_H - 2)) + 1;
+    } while (isWall(sx, sy));
+    slops.push({ x: sx, y: sy });
+    map[sy][sx] = [...SLOP_TILE];
+  }
+}
+
+function isWall(x, y) {
+  return map[y][x][0].includes('#');
+}
+
+function drawSprite(x, y, sprite) {
+  for (let i = 0; i < sprite.length; i++) {
+    map[y + i][x] = sprite[i].padEnd(3, ' ').split('');
+  }
+}
+
+function clearSprite(x, y) {
+  for (let i = 0; i < TILE_H; i++) {
+    map[y + i][x] = [...EMPTY_TILE[i]];
+  }
+}
+
+function render() {
+  // Copy map for rendering
+  let display = map.map(row => row.map(tile => [...tile]));
+
+  // Place slops
+  slops.forEach(slop => {
+    display[slop.y][slop.x] = [...SLOP_TILE[0]];
+  });
+
+  // Place pig and farmer
+  drawSprite(pig.x, pig.y, pigSprite);
+  drawSprite(farmer.x, farmer.y, farmerSprite);
+
+  let output = '';
+  for (let y = 0; y < GRID_H; y++) {
+    for (let line = 0; line < TILE_H; line++) {
+      for (let x = 0; x < GRID_W; x++) {
+        output += map[y][x][line] || '   ';
+      }
+      output += '\n';
+    }
+  }
+
+  output += `\nSlops remaining: ${slops.length}`;
+  output += `\nMove with arrow keys. Collect the slop (~~). Avoid the Evil Farmer!`;
+
+  document.getElementById('game').textContent = output;
+}
+
+function tryMove(character, dx, dy) {
+  const newX = character.x + dx;
+  const newY = character.y + dy;
+
+  // Check bounds
+  if (newX < 1 || newY < 1 || newX >= GRID_W - 1 || newY >= GRID_H - 1) return;
+
+  if (isWall(newX, newY)) return;
+
+  clearSprite(character.x, character.y);
+  character.x = newX;
+  character.y = newY;
+}
+
+function moveFarmerTowardPig() {
+  const dx = Math.sign(pig.x - farmer.x);
+  const dy = Math.sign(pig.y - farmer.y);
+  tryMove(farmer, dx, dy);
+}
+
+function checkSlopCollection() {
+  slops = slops.filter(slop => !(slop.x === pig.x && slop.y === pig.y));
+  if (slops.length === 0) {
+    alert("Victory! The Pig Warlock has reclaimed all his slop!");
+    createEmptyMap();
+  }
+}
+
+function checkFarmerCatch() {
+  if (pig.x === farmer.x && pig.y === farmer.y) {
+    alert("The Evil Farmer caught you! Game Over!");
+    createEmptyMap();
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  let moved = false;
+  switch (e.key) {
+    case 'ArrowUp': tryMove(pig, 0, -1); moved = true; break;
+    case 'ArrowDown': tryMove(pig, 0, 1); moved = true; break;
+    case 'ArrowLeft': tryMove(pig, -1, 0); moved = true; break;
+    case 'ArrowRight': tryMove(pig, 1, 0); moved = true; break;
+  }
+
+  if (moved) {
+    checkSlopCollection();
+    moveFarmerTowardPig();
+    checkFarmerCatch();
+    render();
+  }
+});
+
+createEmptyMap();
+render();
+</script>
+</body>
+</html>
 
