@@ -321,5 +321,22 @@ ctx.fillText(message, canvas.width / 2 - ctx.measureText(message).width/2, canva
         initCritters();
         gameLoop();
 </script>
+ <audio id="background-music" src="Slime Squishes and Oozes Sound Effects.mp3" muted loop autoplay></audio>
+
+<script>
+    const backgroundMusic = document.getElementById('background-music');
+
+    // This function will unmute the music after the first user interaction (click or scroll)
+    function enableSound() {
+        backgroundMusic.muted = false;
+        // The event listeners are removed after the first interaction
+        window.removeEventListener('scroll', enableSound);
+        document.removeEventListener('click', enableSound);
+    }
+
+    // Add event listeners for scroll and click to the window and document
+    window.addEventListener('scroll', enableSound);
+    document.addEventListener('click', enableSound);
+</script>
 </body>
 </html>
