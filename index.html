@@ -283,5 +283,27 @@
     // Call the function repeatedly every few seconds (e.g., every 3000 milliseconds or 3 seconds)
     setInterval(updateCounter, 3000); 
     </script>
+   
+    <audio id="background-music" src="bgsound1.mp3" muted loop autoplay></audio>
+
+<script>
+    const backgroundMusic = document.getElementById('background-music');
+
+    // This function will unmute the music after the first user interaction
+    function enableSound() {
+        backgroundMusic.muted = false;
+        backgroundMusic.play(); // Explicitly call .play() to resume playback
+        
+        // The event listeners are removed after the first interaction
+        window.removeEventListener('scroll', enableSound);
+        document.removeEventListener('click', enableSound);
+        document.removeEventListener('touchstart', enableSound);
+    }
+
+    // Add event listeners for click, touch, and scroll to the document
+    document.addEventListener('click', enableSound);
+    document.addEventListener('touchstart', enableSound);
+    window.addEventListener('scroll', enableSound);
+</script>
 </body>
 </html>
