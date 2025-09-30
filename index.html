@@ -194,23 +194,106 @@
             
  
         </main>
-       
+    
+<!-- This is the menu bar section -->       
+<style>
+  /* Style for the container of each image and its label */
+  .image-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 20px;
+    position: relative;
+  }
+
+  /* Blinking and sparkly pink border effect using a pseudo-element */
+  .image-container::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    bottom: -5px;
+    left: -5px;
+    border: 5px solid transparent;
+    border-radius: 10px;
+    background: linear-gradient(
+        45deg,
+        #ff69b4,
+        #f08080,
+        #ff69b4,
+        #fff
+      )
+      border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    z-index: 1;
+    pointer-events: none;
+    animation: blinkyBorder 1s infinite alternate, sparkleBorder 3s infinite;
+  }
+
+  /* Define the blinking animation for the border */
+  @keyframes blinkyBorder {
+    from {
+      opacity: 0.5;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Define the sparkle/glow animation for the border */
+  @keyframes sparkleBorder {
+    0% {
+      filter: drop-shadow(0 0 5px #ff69b4);
+    }
+    50% {
+      filter: drop-shadow(0 0 15px #f08080) drop-shadow(0 0 20px #fff);
+    }
+    100% {
+      filter: drop-shadow(0 0 5px #ff69b4);
+    }
+  }
+
+  /* Label styling */
+  .image-container .label {
+    margin-top: 10px;
+    color: #fff;
+    font-size: 16px;
+    font-family: sans-serif;
+    text-align: center;
+    white-space: normal;
+  }
+</style>
+
+<!-- This is the menu bar section -->
 <div style="overflow: hidden; height: 300px; white-space: nowrap;">
-    <div style="display: inline-flex;">
-      
-      <a href="slopPG.html" style="margin-right: 20px;">
+  <div style="display: inline-flex; align-items: flex-end;">
+    <!-- First Image with Label -->
+    <div class="image-container">
+      <a href="slopPG.html">
         <img src="https://i.imgur.com/WVaJEy7.png" width="545" height="600">
       </a>
-      
-      <a href="movie1.html" style="margin-right: 20px;">
+      <div class="label">shareholder meeting notes 2002</div>
+    </div>
+
+    <!-- Second Image with Label -->
+    <div class="image-container">
+      <a href="movie1.html">
         <img src="https://i.imgur.com/bo3Eu1D.png" width="450" height="600" alt="Movie 1">
       </a>
-      
+      <div class="label">UAV feed</div>
+    </div>
+
+    <!-- Third Image with Label -->
+    <div class="image-container">
       <a href="slopong.html">
         <img src="https://i.imgur.com/mS7JY5r.jpeg" width="675" height="475">
       </a>
-
+      <div class="label">slopong</div>
     </div>
+  </div>
 </div>
 
     <div>
