@@ -1,2 +1,33 @@
-<img src="report1.jpg">
-<img src="report2.jpg">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Images with No Spacing</title>
+  
+  <style>
+    /*
+      This CSS rule applies to all <img> tags.
+      max-width: 100% ensures the image will never be wider than its container.
+      height: auto ensures the image's aspect ratio is maintained.
+      display: block ensures each image stacks vertically.
+      margin: 0 removes any space around the images.
+    */
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0; /* This line removes all spacing around the images */
+    }
+  </style>
+
+</head>
+<body>
+
+  <h1>Reports</h1>
+
+  <img src="report1.jpg" alt="Report one">
+  <img src="report2.jpg" alt="Report two">
+
+</body>
+</html>
