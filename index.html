@@ -213,6 +213,68 @@
     </div>
 </div>
 
+    <div>
+        <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scrolling Image</title>
+  <style>
+    body {
+      margin: 0;
+      /* Optional: to make the demo stand out from the page background */
+      background-color: #333; 
+    }
+
+    /* The outer container clips the content that scrolls out of view */
+    .scroller {
+      overflow: hidden;
+      width: 100%;
+    }
+
+    /* The inner container holds the repeated images */
+    .scroller-inner {
+      display: inline-block;
+      white-space: nowrap;
+      animation: scroll-left 15s linear infinite; /* Adjust '15s' to change speed */
+    }
+
+    /* Defines the image properties */
+    .scroller-inner img {
+      display: inline-block;
+      margin: 0;
+      max-width: 100%;
+      height: auto;
+    }
+    
+    /* Optional: Pause the animation on hover */
+    .scroller:hover .scroller-inner {
+      animation-play-state: paused;
+    }
+
+    /* Keyframes for the scrolling animation */
+    @keyframes scroll-left {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        /* Moves the content by half its total width to create the loop */
+        transform: translateX(-50%);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scroller">
+    <div class="scroller-inner">
+      <!-- Duplicate the image for a seamless loop -->
+      <img src="https://i.imgur.com/g0jGXrt.jpeg" alt="Scrolling image">
+      <img src="https://i.imgur.com/g0jGXrt.jpeg" alt="Scrolling image">
+    </div>
+  </div>
+
+</body>
+    </div>
 
 <!-- Footer -->
         <footer class="mt-8 text-center">
