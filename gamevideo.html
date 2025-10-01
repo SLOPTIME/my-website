@@ -10,8 +10,8 @@
             padding: 0;
             height: 100%;
             width: 100%;
-            overflow: hidden; /* Hide scrollbars */
-            background-color: black; /* Sets a black background */
+            overflow: hidden;
+            background-color: black;
         }
         #gameVideo {
             position: fixed;
@@ -21,13 +21,13 @@
             min-height: 100%;
             width: auto;
             height: auto;
-            z-index: -100; /* Puts the video in the background */
+            z-index: -100;
             transform: translate(-50%, -50%);
         }
     </style>
 </head>
 <body>
-    <video loop muted controls id="gameVideo">
+    <video loop controls id="gameVideo">
         <source src="game1.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
