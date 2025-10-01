@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Video</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden; /* Hide scrollbars */
+        }
+        #gameVideo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -100; /* Puts the video in the background */
+            transform: translate(-50%, -50%);
+        }
+        /* Style for the video controls */
+        #gameVideo::-webkit-media-controls-panel {
+            display: flex;
+            opacity: 0; /* Hide controls by default */
+            transition: opacity 0.5s ease-in-out;
+        }
+        #gameVideo:hover::-webkit-media-controls-panel {
+            opacity: 1; /* Show controls on hover */
+        }
+    </style>
+</head>
+<body>
+    <video autoplay loop id="gameVideo">
+        <source src="game1.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</body>
+</html>
